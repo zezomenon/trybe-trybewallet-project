@@ -1,4 +1,7 @@
 import React from 'react';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import { userLogin } from '../actions';
 
 class Login extends React.Component {
   constructor() {
@@ -6,21 +9,61 @@ class Login extends React.Component {
     this.state = {
       emailInput: '',
       passwordInput: '',
+      disabled: true,
     };
 
     this.handleChange = this.handleChange.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
   }
+
+  validateEmail(email) {
+    const regexEmail = /^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$/;
+
+    if (email.match(regexEmail)) {
+      return true;
+    }
+    return false;
+  }
+  // source: github rafaelmguimaraes
+
+  validatePassword(password) {
+    const minLength = 6;
+
+    if (password.length >= minLength) {
+      return true;
+    }
+    return false;
+  }
+  // source: github rafaelmguimaraes
 
   handleChange(event) {
     const { name, value } = event.target;
 
-    this.setState({
-      [name]: value,
+    this.setState({ [name]: value }, () => {
+      const { emailInput, passwordInput } = this.state;
+      if (this.validateEmail(emailInput) && this.validatePassword(passwordInput)) {
+        this.setState({
+          disabled: false,
+        });
+      } else {
+        this.setState({
+          disabled: true,
+        });
+      }
     });
+    // source: github rafaelmguimaraes
+  }
+
+  handleSubmit() {
+    const { emailInput } = this.state;
+    const { login, history } = this.props;
+
+    login(emailInput);
+    history.push('/carteira');
   }
 
   render() {
-    const { emailInput, passwordInput } = this.state;
+    const { emailInput, passwordInput, disabled } = this.state;
     return (
       <div>
         <form>
@@ -44,11 +87,30 @@ class Login extends React.Component {
               onChange={ this.handleChange }
             />
           </label>
-          <button type="submit">Entrar</button>
+          <button
+            type="submit"
+            onClick={ this.handleSubmit }
+            disabled={ disabled }
+          >
+            Entrar
+          </button>
         </form>
       </div>
     );
   }
 }
 
-export default Login;
+const mapDispatchToProps = (dispatch) => ({
+  login: (email) => dispatch(userLogin(email)),
+});
+
+const mapStateToProps = (state) => ({
+  userLogin: state.user.email,
+});
+
+Login.propTypes = {
+  login: PropTypes.func.isRequired,
+  history: PropTypes.objectOf.isRequired,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Login);
