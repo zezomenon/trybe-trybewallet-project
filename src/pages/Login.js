@@ -104,13 +104,13 @@ const mapDispatchToProps = (dispatch) => ({
   login: (email) => dispatch(userLogin(email)),
 });
 
-const mapStateToProps = (state) => ({
-  userLogin: state.user.email,
-});
+// const mapStateToProps = (state) => ({
+//   userLogin: state.user.email,
+// });
 
 Login.propTypes = {
   login: PropTypes.func.isRequired,
   history: PropTypes.objectOf.isRequired,
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(Login);
+export default connect(null, mapDispatchToProps)(Login);
