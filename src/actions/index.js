@@ -1,21 +1,20 @@
 // Coloque aqui suas actions
 export const USERLOGIN = 'USERLOGIN';
-export const WALLET = 'WALLET';
-export const FETCHDATA = 'FETCHDATA';
+export const ADD_CURRENCIES = 'ADD_CURRENCIES';
+export const ADD_EXPENSES = 'ADD_EXPENSES';
+// export const FETCHDATA = 'FETCHDATA';
 
 export const userLogin = (email) => ({
   type: USERLOGIN,
   email,
 });
 
-export const wallet = (data) => ({
-  type: WALLET,
-  data,
+export const walletAddCurrencies = (addCurrencies) => ({
+  type: ADD_CURRENCIES,
+  addCurrencies,
 });
 
-export const fetchData = async () => {
-  const response = await fetch('https://economia.awesomeapi.com.br/json/all');
-  const data = await response.json();
-  // dispatch(wallet(data));
-  return data;
-};
+export const walletAddExpenses = (addExpenses) => ({
+  type: ADD_EXPENSES,
+  addExpenses,
+});
