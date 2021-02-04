@@ -9,7 +9,7 @@ class Wallet extends React.Component {
     super();
     this.state = {
       id: '',
-      value: '',
+      value: 0,
       description: '',
       currency: '',
       method: '',
@@ -40,13 +40,19 @@ class Wallet extends React.Component {
 
   async handleClick() {
     const { addExpenses } = this.props;
-    const { expenses } = this.state;
-    // if (expenses.length === '') {
-    console.log(expenses);
-    // }
-    this.setState({
-      exchangeRates: await fetchData(),
-    });
+    const { id } = this.state;
+    const zero = 0;
+    if (id === '') {
+      this.setState({
+        id: zero,
+        exchangeRates: await fetchData(),
+      });
+    } else {
+      this.setState({
+        id: id + 1,
+        exchangeRates: await fetchData(),
+      });
+    }
     addExpenses(this.state);
   }
 
@@ -64,6 +70,7 @@ class Wallet extends React.Component {
     } = this.state;
 
     const totalField = 0;
+
     return (
       <div>
         <div>
@@ -104,6 +111,7 @@ class Wallet extends React.Component {
               value={ currency }
               onChange={ this.handleChange }
             >
+              {/* <option selected>Escolha...</option> */}
               {currencies.map(
                 (item) => (
                   <option
