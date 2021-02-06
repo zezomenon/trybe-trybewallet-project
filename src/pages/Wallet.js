@@ -15,10 +15,12 @@ class Wallet extends React.Component {
       method: '',
       tag: '',
       exchangeRates: {},
+      totalField: 0,
     };
     this.fetchApi = this.fetchApi.bind(this);
     this.handleClick = this.handleClick.bind(this);
     this.handleChange = this.handleChange.bind(this);
+    this.handleTotal = this.handleTotal.bind(this);
   }
 
   componentDidMount() {
@@ -40,6 +42,7 @@ class Wallet extends React.Component {
 
   async handleClick() {
     const { addExpenses } = this.props;
+
     const { id } = this.state;
     const zero = 0;
     if (id === '') {
@@ -54,6 +57,21 @@ class Wallet extends React.Component {
       });
     }
     addExpenses(this.state);
+
+    this.handleTotal();
+  }
+
+  handleTotal() {
+    const { expenses } = this.props;
+    const total = expenses.reduce((acc, despesa) => {
+      const cot = despesa.exchangeRates[despesa.currency].ask;
+      return acc + (parseFloat(despesa.value) * parseFloat(cot));
+    }, 0).toFixed(2);
+
+    this.setState({
+      totalField: total,
+    });
+    console.log(total);
   }
 
   render() {
@@ -67,9 +85,8 @@ class Wallet extends React.Component {
       currency,
       method,
       tag,
+      totalField,
     } = this.state;
-
-    const totalField = 0;
 
     return (
       <div>
@@ -78,7 +95,11 @@ class Wallet extends React.Component {
             Usuário:
             { userEmail }
           </h2>
-          <h3 data-testid="total-field">{ totalField }</h3>
+          <h3
+            data-testid="total-field"
+          >
+            { totalField }
+          </h3>
           <h3 data-testid="header-currency-field">BRL</h3>
         </div>
         <form>
@@ -111,10 +132,10 @@ class Wallet extends React.Component {
               value={ currency }
               onChange={ this.handleChange }
             >
-              {/* <option selected>Escolha...</option> */}
               {currencies.map(
                 (item) => (
                   <option
+                    // name="currency"
                     key={ item }
                     value={ item }
                     data-testid={ item }
@@ -196,6 +217,7 @@ Wallet.propTypes = {
   addCurrencies: PropTypes.func.isRequired,
   addExpenses: PropTypes.func.isRequired,
   currencies: PropTypes.objectOf.isRequired,
+  expenses: PropTypes.objectOf.isRequired,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Wallet);
