@@ -57,8 +57,6 @@ class Wallet extends React.Component {
       });
     }
     addExpenses(this.state);
-
-    // this.handleTotal();
   }
 
   handleTotal() {
@@ -69,15 +67,11 @@ class Wallet extends React.Component {
       return acc + (parseFloat(expense.value) * parseFloat(cot));
     }, 0).toFixed(2);
 
-    // this.setState({
-    //   totalField: total,
-    // });
-    return totalField;
+    return totalField; // Rafa ajudou no entendimento do pq estava concatenando e não somando... (parseFloat)
   }
 
   handleDelete(id) {
     const { expenses, deleteExpenses } = this.props;
-    console.log(expenses);
     const deleteItemFromID = expenses.filter((item) => item.id !== id);
     deleteExpenses(deleteItemFromID);
   }
@@ -94,12 +88,6 @@ class Wallet extends React.Component {
       method,
       tag,
     } = this.state;
-
-    // const totalField = expenses.length === 0 ? 0 : expenses.reduce((acc, despesa) => {
-    //   console.log(despesa);
-    //   const cota = despesa.exchangeRates[despesa.currency].ask;
-    //   return acc + (parseFloat(despesa.value) * parseFloat(cota));
-    // }, 0).toFixed(2);
 
     return (
       <div>

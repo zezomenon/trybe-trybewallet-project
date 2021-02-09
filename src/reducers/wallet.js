@@ -21,7 +21,7 @@ const wallet = (state = INITIAL_STATE, action) => {
   case DEL_EXPENSES:
     return {
       ...state,
-      expenses: [...state.expenses, action.deleteExpenses],
+      expenses: action.deleteExpenses,
     };
   default:
     return state;
