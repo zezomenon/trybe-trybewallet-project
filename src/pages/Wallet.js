@@ -12,11 +12,9 @@ class Wallet extends React.Component {
       value: 0,
       description: '',
       currency: 'USD',
-      method: '',
-      tag: '',
+      method: 'Dinheiro',
+      tag: 'Alimentação',
       exchangeRates: {},
-      totalField: 0,
-      // exchangeValue: 0,
     };
     this.fetchApi = this.fetchApi.bind(this);
     this.handleClick = this.handleClick.bind(this);
@@ -60,23 +58,26 @@ class Wallet extends React.Component {
     }
     addExpenses(this.state);
 
-    this.handleTotal();
+    // this.handleTotal();
   }
 
   handleTotal() {
     const { expenses } = this.props;
-    const total = expenses.reduce((acc, despesa) => {
-      const cot = despesa.exchangeRates[despesa.currency].ask;
-      return acc + (parseFloat(despesa.value) * parseFloat(cot));
+    const totalField = expenses.reduce((acc, expense) => {
+      const cot = expense.exchangeRates[expense.currency].ask;
+      // console.log(cot);
+      return acc + (parseFloat(expense.value) * parseFloat(cot));
     }, 0).toFixed(2);
 
-    this.setState({
-      totalField: total,
-    });
+    // this.setState({
+    //   totalField: total,
+    // });
+    return totalField;
   }
 
   handleDelete(id) {
     const { expenses, deleteExpenses } = this.props;
+    console.log(expenses);
     const deleteItemFromID = expenses.filter((item) => item.id !== id);
     deleteExpenses(deleteItemFromID);
   }
@@ -92,8 +93,13 @@ class Wallet extends React.Component {
       currency,
       method,
       tag,
-      totalField,
     } = this.state;
+
+    // const totalField = expenses.length === 0 ? 0 : expenses.reduce((acc, despesa) => {
+    //   console.log(despesa);
+    //   const cota = despesa.exchangeRates[despesa.currency].ask;
+    //   return acc + (parseFloat(despesa.value) * parseFloat(cota));
+    // }, 0).toFixed(2);
 
     return (
       <div>
@@ -105,7 +111,7 @@ class Wallet extends React.Component {
           <h3
             data-testid="total-field"
           >
-            { totalField }
+            { this.handleTotal() }
           </h3>
           <h3 data-testid="header-currency-field">BRL</h3>
         </div>
@@ -133,7 +139,7 @@ class Wallet extends React.Component {
           <label htmlFor="currency">
             Moeda:
             <select
-              type="select"
+              id="currency"
               name="currency"
               data-testid="currency-input"
               value={ currency }
@@ -142,7 +148,6 @@ class Wallet extends React.Component {
               {currencies.map(
                 (item) => (
                   <option
-                    // name="currency"
                     key={ item }
                     value={ item }
                     data-testid={ item }
@@ -155,7 +160,7 @@ class Wallet extends React.Component {
           <label htmlFor="method">
             Método pagamento:
             <select
-              type="select"
+              id="method"
               name="method"
               data-testid="method-input"
               value={ method }
@@ -176,7 +181,7 @@ class Wallet extends React.Component {
           <label htmlFor="tag">
             Tags:
             <select
-              type="select"
+              id="tag"
               name="tag"
               data-testid="tag-input"
               value={ tag }
@@ -197,7 +202,7 @@ class Wallet extends React.Component {
           <div>
             <button
               type="button"
-              onClick={ this.handleClick }
+              onClick={ () => this.handleClick() }
             >
               Adicionar despesa
             </button>
@@ -225,9 +230,12 @@ class Wallet extends React.Component {
                   <td>{item.tag}</td>
                   <td>{item.method}</td>
                   <td>{item.value}</td>
-                  <td>{item.exchangeRates[currency].name}</td>
-                  <td>{item.exchangeRates[currency].ask}</td>
-                  <td>Exchange</td>
+                  <td>{item.exchangeRates[item.currency].name}</td>
+                  <td>{parseFloat(item.exchangeRates[item.currency].ask).toFixed(2)}</td>
+                  <td>
+                    {parseFloat(item.exchangeRates[item.currency].ask
+                    * item.value).toFixed(2)}
+                  </td>
                   <td>Real</td>
                   <td>
                     <button
@@ -263,7 +271,7 @@ const mapStateToProps = (state) => ({
 });
 
 const mapDispatchToProps = (dispatch) => ({
-  addCurrencies: (currencie) => dispatch(walletAddCurrencies(currencie)),
+  addCurrencies: (currency) => dispatch(walletAddCurrencies(currency)),
   addExpenses: (expense) => dispatch(walletAddExpenses(expense)),
   deleteExpenses: (delexpense) => dispatch(walletDelExpenses(delexpense)),
 });
