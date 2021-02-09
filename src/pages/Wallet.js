@@ -57,6 +57,9 @@ class Wallet extends React.Component {
       });
     }
     addExpenses(this.state);
+    this.setState({
+      value: 0,
+    });
   }
 
   handleTotal() {
