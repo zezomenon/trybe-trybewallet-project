@@ -1,7 +1,13 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import { walletAddCurrencies, walletAddExpenses, walletDelExpenses } from '../actions';
+import {
+  walletAddCurrencies,
+  walletAddExpenses,
+  walletDelExpenses,
+  walletInitalEditExpenses,
+  walletUpdateItemExpense,
+} from '../actions';
 import fetchData from '../services/api';
 
 class Wallet extends React.Component {
@@ -21,6 +27,8 @@ class Wallet extends React.Component {
     this.handleChange = this.handleChange.bind(this);
     this.handleTotal = this.handleTotal.bind(this);
     this.handleDelete = this.handleDelete.bind(this);
+    this.handleButtonEdit = this.handleButtonEdit.bind(this);
+    this.handleUpdate = this.handleUpdate.bind(this);
   }
 
   componentDidMount() {
@@ -62,6 +70,12 @@ class Wallet extends React.Component {
     });
   }
 
+  handleUpdate() {
+    const { updateItemExpense } = this.props;
+    const { id } = this.state;
+    updateItemExpense(this.state, id);
+  }
+
   handleTotal() {
     const { expenses } = this.props;
     const totalField = expenses.reduce((acc, expense) => {
@@ -79,11 +93,26 @@ class Wallet extends React.Component {
     deleteExpenses(deleteItemFromID);
   }
 
+  handleButtonEdit(id) {
+    const { initialEditExpenses, expenses } = this.props;
+    const { value, description, currency, method, tag, exchangeRates } = expenses[id];
+    initialEditExpenses(null, id);
+    this.setState({
+      id,
+      value,
+      description,
+      currency,
+      method,
+      tag,
+      exchangeRates,
+    });
+  }
+
   render() {
     const paymentMethod = ['Dinheiro', 'Cartão de crédito', 'Cartão de débito'];
     const tags = ['Alimentação', 'Lazer', 'Trabalho', 'Transporte', 'Saúde'];
 
-    const { userEmail, currencies, expenses } = this.props;
+    const { userEmail, currencies, expenses, editItem } = this.props;
     const {
       value,
       description,
@@ -193,9 +222,9 @@ class Wallet extends React.Component {
           <div>
             <button
               type="button"
-              onClick={ () => this.handleClick() }
+              onClick={ editItem ? () => this.handleUpdate() : () => this.handleClick() }
             >
-              Adicionar despesa
+              {editItem ? 'Editar despesa' : 'Adicionar despesa'}
             </button>
           </div>
         </form>
@@ -233,6 +262,7 @@ class Wallet extends React.Component {
                       type="button"
                       data-testid="edit-btn"
                       className="btn btn-warning btn-sm"
+                      onClick={ () => this.handleButtonEdit(item.id) }
                     >
                       Editar
                     </button>
@@ -259,12 +289,20 @@ const mapStateToProps = (state) => ({
   userEmail: state.user.email,
   currencies: state.wallet.currencies,
   expenses: state.wallet.expenses,
+  editItem: state.wallet.editItem,
 });
 
 const mapDispatchToProps = (dispatch) => ({
   addCurrencies: (currency) => dispatch(walletAddCurrencies(currency)),
   addExpenses: (expense) => dispatch(walletAddExpenses(expense)),
-  deleteExpenses: (delexpense) => dispatch(walletDelExpenses(delexpense)),
+  deleteExpenses: (deleteExpense) => dispatch(walletDelExpenses(deleteExpense)),
+  initialEditExpenses:
+    (initialEditExpenses, itemID) => dispatch(
+      walletInitalEditExpenses(initialEditExpenses, itemID),
+    ),
+  updateItemExpense: (updateItemExpense, itemID) => dispatch(
+    walletUpdateItemExpense(updateItemExpense, itemID),
+  ),
 });
 
 Wallet.propTypes = {
@@ -272,8 +310,11 @@ Wallet.propTypes = {
   addCurrencies: PropTypes.func.isRequired,
   addExpenses: PropTypes.func.isRequired,
   deleteExpenses: PropTypes.func.isRequired,
+  initialEditExpenses: PropTypes.func.isRequired,
+  updateItemExpense: PropTypes.func.isRequired,
   currencies: PropTypes.objectOf.isRequired,
   expenses: PropTypes.objectOf.isRequired,
+  editItem: PropTypes.bool.isRequired,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Wallet);
